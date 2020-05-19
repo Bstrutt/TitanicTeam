@@ -3,6 +3,8 @@ import numpy as np
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
 
 #Load training and test sets
 train = pd.read_csv("train.csv")
@@ -32,13 +34,18 @@ for i in range(0,len(test['Cabin'])):
     else:
         test.at[i, 'Cabin'] = 1
 
-#impute missing age values
-ageImputer = SimpleImputer()
-train['Age'] = ageImputer.fit_transform(train['Age'].values.reshape(-1,1))
-test['Age'] = ageImputer.transform(test['Age'].values.reshape(-1,1))
 
-fareImputer = SimpleImputer()
-test['Fare'] = fareImputer.fit_transform(test['Fare'].values.reshape(-1,1))
+#impute missing age values
+imp = IterativeImputer(max_iter=10, random_state=0)
+train[trainFeatures] = imp.fit_transform(train[trainFeatures])
+test[trainFeatures] = imp.transform(test[trainFeatures])
+
+#ageImputer = SimpleImputer()
+#train['Age'] = ageImputer.fit_transform(train['Age'].values.reshape(-1,1))
+#test['Age'] = ageImputer.transform(test['Age'].values.reshape(-1,1))
+
+#fareImputer = SimpleImputer()
+#test['Fare'] = fareImputer.fit_transform(test['Fare'].values.reshape(-1,1))
 
 rfc = RandomForestClassifier(max_depth=8, random_state=0)
 rfc.fit(train[trainFeatures],train['Survived'])
