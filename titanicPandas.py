@@ -4,7 +4,9 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.experimental import enable_iterative_imputer
+from sklearn import svm
 from sklearn.impute import IterativeImputer
+from sklearn.preprocessing import StandardScaler
 
 #Load training and test sets
 train = pd.read_csv("train.csv")
@@ -40,17 +42,17 @@ imp = IterativeImputer(max_iter=10, random_state=0)
 train[trainFeatures] = imp.fit_transform(train[trainFeatures])
 test[trainFeatures] = imp.transform(test[trainFeatures])
 
-#ageImputer = SimpleImputer()
-#train['Age'] = ageImputer.fit_transform(train['Age'].values.reshape(-1,1))
-#test['Age'] = ageImputer.transform(test['Age'].values.reshape(-1,1))
+scaler = StandardScaler()
+train[trainFeatures] = scaler.fit_transform(train[trainFeatures])
+test[trainFeatures] = scaler.transform(test[trainFeatures])
 
-#fareImputer = SimpleImputer()
-#test['Fare'] = fareImputer.fit_transform(test['Fare'].values.reshape(-1,1))
+svm = svm.NuSVC()
+svm.fit(train[trainFeatures], train['Survived'])
+y= svm.predict(test[trainFeatures])
 
-rfc = RandomForestClassifier(max_depth=8, random_state=0)
-rfc.fit(train[trainFeatures],train['Survived'])
-
-y = rfc.predict(test[trainFeatures])
+#rfc = RandomForestClassifier(max_depth=8, random_state=0)
+#rfc.fit(train[trainFeatures],train['Survived'])
+#y = rfc.predict(test[trainFeatures])
 
 
 resultFile = open("result.csv", 'w')
