@@ -4,9 +4,16 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from sklearn.experimental import enable_iterative_imputer
 from sklearn import svm
+from sklearn.linear_model import SGDClassifier
 from sklearn.impute import IterativeImputer
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import BaggingClassifier
+from sklearn.kernel_approximation import Nystroem
+from sklearn.pipeline import make_pipeline
+from sklearn.ensemble import RandomForestClassifier
+
+model = 'svm'
+scale = 'standard'
 
 
 def status(feature):
@@ -28,7 +35,7 @@ def get_combined_data():
     # we'll also remove the PassengerID since this is not an informative feature
     combined = train.append(test)
     combined.reset_index(inplace=True)
-    combined.drop(['index', 'PassengerId'], inplace=True, axis=1)
+    combined.drop(['index'], inplace=True, axis=1)
 
     return combined
 
@@ -245,13 +252,30 @@ bc = BaggingClassifier(base_estimator=svm, n_estimators=20)
 bc.fit(train, targets)
 y = bc.predict(test)
 
-# rfc = RandomForestClassifier(max_depth=8, random_state=0)
-# rfc.fit(train[trainFeatures],train['Survived'])
 
-# y = rfc.predict(test[trainFeatures])
+if scale == 'standard':
+    # Scale all values for easier model use
+    scaler = StandardScaler()
+    train = scaler.fit_transform(train)
+    test = scaler.transform(test)
 
-resultFile = open("result_.csv", 'w')
+if model == 'svm':
+    svm = svm.NuSVC(probability=True)
+    bc = BaggingClassifier(base_estimator=svm, n_estimators=20)
+
+if model == 'percep':
+    bc = make_pipeline(Nystroem(gamma=0.2, n_components=300),
+                   BaggingClassifier(base_estimator=SGDClassifier(loss='perceptron', max_iter=1000, tol=1e-3), n_estimators=20))
+
+if model == 'rfc':
+    bc = RandomForestClassifier(max_depth=8, random_state=0)
+
+# Run selected model
+bc.fit(train, targets)
+y = bc.predict(test)
+
+resultFile = open("outputs/result.csv", 'w')
 resultFile.write("PassengerID,Survived\n")
 for i in range(0, len(y)):
-    resultFile.write(str(test.iat[i, 0]) + "," + str(y[i]) + "\n")
+    resultFile.write(str(test.at[i, 'PassengerId']) + "," + str(y[i]) + "\n")
 resultFile.close()
