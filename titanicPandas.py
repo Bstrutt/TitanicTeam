@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-
 from sklearn.preprocessing import LabelEncoder
 from sklearn.experimental import enable_iterative_imputer
 from sklearn import svm
@@ -15,17 +14,16 @@ from sklearn.ensemble import RandomForestClassifier
 model = 'svm'
 scale = 'standard'
 
-
 def status(feature):
     print('Processing', feature, ': ok')
 
 
 def get_combined_data():
     # reading train data
-    train = pd.read_csv('train.csv')
+    train = pd.read_csv("inputs/train.csv")
 
     # reading test data
-    test = pd.read_csv('test.csv')
+    test = pd.read_csv("inputs/test.csv")
 
     # extracting and then removing the targets from the training data
     targets = train.Survived
@@ -43,7 +41,7 @@ def get_combined_data():
 def recover_train_test_target():
     global combined
 
-    targets = pd.read_csv('train.csv', usecols=['Survived'])['Survived'].values
+    targets = pd.read_csv('inputs/train.csv', usecols=['Survived'])['Survived'].values
     train = combined.iloc[:891]
     test = combined.iloc[891:]
 
@@ -231,7 +229,6 @@ def process_family():
 
     status('family')
     return combined
-
 
 combined = get_titles()
 combined = process_age()

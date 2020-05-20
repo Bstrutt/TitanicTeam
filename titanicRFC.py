@@ -4,12 +4,12 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 
 # load training set into csv
-with open("train.csv", 'r') as f:
+with open("inputs/train.csv", 'r') as f:
     originalTrain = list(csv.reader(f, delimiter=","))
 train = np.array(originalTrain[1:]) #train gets everything minus titles
 
 #load testing set into csv
-with open("test.csv", 'r') as f1:
+with open("inputs/test.csv", 'r') as f1:
     originalTest = list(csv.reader(f1, delimiter=","))
 test = np.array(originalTest[1:]) # test gets everything minus titles
 
@@ -65,7 +65,7 @@ rfc.fit(train,survived)
 
 testPredictions = rfc.predict(test)
 
-resultFile = open("result.csv", 'w')
+resultFile = open("outputs/result.csv", 'w')
 resultFile.write("PassengerID,Survived\n")
 for i in range(0, len(testPredictions)):
     resultFile.write(str(testIds[i]) + "," + str(testPredictions[0]) + "\n")

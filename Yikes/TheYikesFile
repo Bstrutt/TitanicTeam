@@ -1,0 +1,5 @@
+# impute missing age values
+imp = IterativeImputer(max_iter=10, random_state=0)
+train[trainFeatures] = imp.fit_transform(train[trainFeatures])
+test[trainFeatures] = imp.transform(test[trainFeatures])
+
